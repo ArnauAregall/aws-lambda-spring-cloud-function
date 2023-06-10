@@ -1,0 +1,8 @@
+app:
+  weather:
+    open-meteo:
+      base-url: "https://api.open-meteo.com/v1/"
+      timeout: "PT3S"
+      hourly-params:
+        - "temperature_2m"
+        - "precipitation"

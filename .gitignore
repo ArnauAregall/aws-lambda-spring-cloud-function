@@ -55,3 +55,9 @@ out/
 ######################
 .gradle/wrapper/gradle-wrapper.jar
 .gradle/**
+
+######################
+# AWS SAM
+######################
+.aws-sam/**
+samconfig.toml

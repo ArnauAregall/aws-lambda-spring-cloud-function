@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: tech.aaregall.lab:aws-lambda-spring-cloud-function
+
+Globals:
+  Api:
+    # API Gateway regional endpoints
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  SpringCloudFunctionLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: tech.aaregall.lab.functions.AwsLambdaHandler::handleRequest
+      Runtime: java17
+      Architectures:
+        - arm64
+      CodeUri: .
+      MemorySize: 1512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 60
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            TimeoutInMillis: 20000
+            PayloadFormatVersion: '1.0'
+
+Outputs:
+  ForecastFunction:
+    Description: URL for forecast function
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/forecast'
+    Export:
+      Name: ForecastFunction

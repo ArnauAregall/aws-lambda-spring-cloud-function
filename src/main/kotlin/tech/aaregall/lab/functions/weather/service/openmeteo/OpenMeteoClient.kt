@@ -31,13 +31,14 @@ class OpenMeteoClient(private val openMeteoProperties: OpenMeteoProperties, webC
     private val openMeteoHttpClient: OpenMeteoHttpClient = HttpServiceProxyFactory
         .builder(
             WebClientAdapter.forClient(
-            webClientBuilder
-                .baseUrl(openMeteoProperties.baseUrl)
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(openMeteoProperties.timeout)))
-                .defaultStatusHandler(Predicate.not(HttpStatusCode::is2xxSuccessful)) {
-                    Mono.error(OpenMeteoException("Error: OpenMeteo API responded with ${it.statusCode()}"))
-                }
-                .build()))
+                webClientBuilder
+                    .baseUrl(openMeteoProperties.baseUrl)
+                    .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(openMeteoProperties.timeout)))
+                    .defaultStatusHandler(Predicate.not(HttpStatusCode::is2xxSuccessful)) {
+                        Mono.error(OpenMeteoException("Error: OpenMeteo API responded with ${it.statusCode()}"))
+                    }.build()
+            )
+        )
         .build()
         .createClient()
 

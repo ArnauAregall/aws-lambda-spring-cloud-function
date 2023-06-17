@@ -4,21 +4,23 @@ Description: tech.aaregall.lab:aws-lambda-spring-cloud-function
 
 Globals:
   Api:
-    # API Gateway regional endpoints
-    EndpointConfiguration: REGIONAL
+    EndpointConfiguration: REGIONAL # API Gateway regional endpoints
+  Function:
+    Timeout: 20
+    MemorySize: 1512
+    Runtime: provided.al2
+    Architectures:
+      - arm64
+    Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 
 Resources:
   SpringCloudFunctionLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: tech.aaregall.lab.functions.AwsLambdaHandler::handleRequest
-      Runtime: java17
-      Architectures:
-        - arm64
+      Handler: none # Native runtime does not need a handler
       CodeUri: .
-      MemorySize: 1512
       Policies: AWSLambdaBasicExecutionRole
-      Timeout: 60
+
       Events:
         HttpApiEvent:
           Type: HttpApi
@@ -26,9 +28,12 @@ Resources:
             TimeoutInMillis: 20000
             PayloadFormatVersion: '1.0'
 
+    Metadata:
+      BuildMethod: makefile # Instruct SAM how to build application.
+
 Outputs:
-  ForecastFunction:
-    Description: URL for forecast function
-    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/forecast'
+  SpringCloudFunctionLambda:
+    Description: AWS Lambda Spring Cloud Function
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com'
     Export:
-      Name: ForecastFunction
+      Name: SpringCloudFunctionLambda

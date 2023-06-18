@@ -26,13 +26,21 @@ in a compatible Docker container.
     sam build --use-container --build-image tech.aaregall.lab/amazonlinux-graalvm:latest
     ````
 
-## Deploying the AWS Lambda
+## Deploy the application as an AWS Lambda using SAM
+
+### Deploy the Lambda application
 
 ````bash
 sam deploy --region <Your Region>
 ````
 
-### Delete the AWS Lambda
+### See CloudWatch logs
+
+````bash
+sam logs -n SpringCloudFunctionLambda --stack-name aws-lambda-spring-cloud-function
+````
+
+### Delete the Lambda application
 
 ````bash
 sam delete SpringCloudFunctionLambda

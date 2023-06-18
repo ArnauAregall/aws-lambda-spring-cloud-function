@@ -1,0 +1,8 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "aws-lambda-spring-cloud-function"
+resolve_s3 = true
+s3_prefix = "aws-lambda-spring-cloud-function"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = false

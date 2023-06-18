@@ -60,4 +60,3 @@ out/
 # AWS SAM
 ######################
 .aws-sam/**
-samconfig.toml

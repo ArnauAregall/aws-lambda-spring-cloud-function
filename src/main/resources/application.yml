@@ -1,8 +1,12 @@
 app:
-  weather:
-    open-meteo:
-      base-url: "https://api.open-meteo.com/v1/"
-      timeout: "PT3S"
-      hourly-params:
-        - "temperature_2m"
-        - "precipitation"
+  open-meteo:
+    base-url: "https://api.open-meteo.com/v1/"
+    timeout: "PT3S"
+    hourly-params:
+      - "temperature_2m"
+      - "precipitation"
+  openai:
+    base-url: "https://api.openai.com/v1/"
+    timeout: "PT10S"
+    api-key: ${OPENAI_API_KEY}
+    model: "gpt-3.5-turbo-16k"

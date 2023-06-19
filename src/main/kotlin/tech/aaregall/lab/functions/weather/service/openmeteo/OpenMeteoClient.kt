@@ -16,9 +16,9 @@ import org.springframework.web.service.invoker.createClient
 import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import java.time.Duration
-import java.util.function.Predicate
+import java.util.function.Predicate.not
 
-@ConfigurationProperties("app.weather.open-meteo")
+@ConfigurationProperties("app.open-meteo")
 data class OpenMeteoProperties (
     val baseUrl: String,
     val timeout: Duration,
@@ -34,7 +34,7 @@ class OpenMeteoClient(private val openMeteoProperties: OpenMeteoProperties, webC
                 webClientBuilder
                     .baseUrl(openMeteoProperties.baseUrl)
                     .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(openMeteoProperties.timeout)))
-                    .defaultStatusHandler(Predicate.not(HttpStatusCode::is2xxSuccessful)) {
+                    .defaultStatusHandler(not(HttpStatusCode::is2xxSuccessful)) {
                         Mono.error(OpenMeteoException("Error: OpenMeteo API responded with ${it.statusCode()}"))
                     }.build()
             )

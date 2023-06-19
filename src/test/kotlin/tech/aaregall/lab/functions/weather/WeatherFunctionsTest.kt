@@ -77,9 +77,9 @@ class WeatherFunctionsTest(
                                 "latitude": $latitude,
                                 "longitude": $longitude,
                                 "hourly": {
-                                    "time": ["2023-06-10T00:00"],
-                                    "temperature_2m": [17.6],
-                                    "precipitation": [1.0]
+                                    "time": ["2023-06-10T00:00", "2023-06-10T01:00"],
+                                    "temperature_2m": [17.6, 17.2],
+                                    "precipitation": [1.0, 0.5]
                                 }
                             }
                         """.trimIndent()))
@@ -99,10 +99,13 @@ class WeatherFunctionsTest(
                 .jsonPath("$.geoLocation.latitude").isEqualTo(latitude)
                 .jsonPath("$.geoLocation.longitude").isEqualTo(longitude)
                 .jsonPath("$.hourlyForecasts").isArray
-                .jsonPath("$.hourlyForecasts.length()").isEqualTo(1)
+                .jsonPath("$.hourlyForecasts.length()").isEqualTo(2)
                 .jsonPath("$.hourlyForecasts[0].time").isEqualTo("2023-06-10T00:00:00")
                 .jsonPath("$.hourlyForecasts[0].temperature").isEqualTo(17.6)
                 .jsonPath("$.hourlyForecasts[0].precipitation").isEqualTo(1.0)
+                .jsonPath("$.hourlyForecasts[1].time").isEqualTo("2023-06-10T01:00:00")
+                .jsonPath("$.hourlyForecasts[1].temperature").isEqualTo(17.2)
+                .jsonPath("$.hourlyForecasts[1].precipitation").isEqualTo(0.5)
         }
 
     }

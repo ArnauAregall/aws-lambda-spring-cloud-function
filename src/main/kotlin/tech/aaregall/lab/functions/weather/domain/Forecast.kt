@@ -11,4 +11,10 @@ data class HourlyForecast (
     val time: LocalDateTime,
     val temperature: Float,
     val precipitation: Float
-)
+) {
+
+    override fun toString(): String {
+        return "At $time, temperature will be $temperature º, precipitation of $precipitation mm"
+    }
+
+}

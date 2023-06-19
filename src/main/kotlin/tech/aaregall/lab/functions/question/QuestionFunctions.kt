@@ -14,6 +14,6 @@ import tech.aaregall.lab.functions.question.service.QuestionService
 class QuestionFunctions {
 
     @Bean
-    fun question(chatService: QuestionService): (Message<Question>) -> Mono<Answer> = chatService::answerQuestion
+    fun question(questionService: QuestionService): (Message<Question>) -> Mono<Answer> = questionService::answerQuestion
 
 }

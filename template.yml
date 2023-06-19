@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: tech.aaregall.lab:aws-lambda-spring-cloud-function
 
+Parameters:
+  OpenAiApiKey:
+    Type: String
+    Description: OpenAI API key
+
 Globals:
   Api:
     EndpointConfiguration: REGIONAL # API Gateway regional endpoints
@@ -20,7 +25,9 @@ Resources:
       Handler: none # Native runtime does not need a handler
       CodeUri: .
       Policies: AWSLambdaBasicExecutionRole
-
+      Environment:
+        Variables:
+          OPENAI_API_KEY: !Ref OpenAiApiKey
       Events:
         HttpApiEvent:
           Type: HttpApi

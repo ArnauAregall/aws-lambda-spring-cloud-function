@@ -28,10 +28,17 @@ in a compatible Docker container.
 
 ## Deploy the application as an AWS Lambda using SAM
 
+Define the following environment variables on the deployment host.
+
+````bash
+export AWS_REGION=...
+export OPENAI_API_KEY=...
+````
+
 ### Deploy the Lambda application
 
 ````bash
-sam deploy --region <Your Region>
+sam deploy --region $AWS_REGION --parameter-overrides ParameterKey=OpenAiApiKey,ParameterValue=$OPENAI_API_KEY
 ````
 
 ### See CloudWatch logs

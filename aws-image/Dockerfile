@@ -10,7 +10,7 @@ RUN yum -y update \
 
 # Install SDKMan and Java GraalVM
 RUN curl -s "https://get.sdkman.io" | bash
-RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install java 22.3.r17-grl
+RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install java 22.3.1.r17-grl
 ENV JAVA_HOME "/root/.sdkman/candidates/java/current"
 
 # Install AWS Lambda Builders

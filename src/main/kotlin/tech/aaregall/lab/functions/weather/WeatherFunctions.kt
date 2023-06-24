@@ -1,6 +1,5 @@
 package tech.aaregall.lab.functions.weather
 
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.Message
@@ -11,7 +10,6 @@ import tech.aaregall.lab.functions.weather.domain.GeoLocation
 import tech.aaregall.lab.functions.weather.service.WeatherService
 
 @Configuration
-@RegisterReflectionForBinding(classes = [GeoLocation::class, Forecast::class])
 class WeatherFunctions {
 
     @Bean

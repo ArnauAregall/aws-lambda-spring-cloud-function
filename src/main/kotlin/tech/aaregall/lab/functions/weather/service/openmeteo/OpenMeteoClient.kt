@@ -1,6 +1,5 @@
 package tech.aaregall.lab.functions.weather.service.openmeteo
 
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -42,7 +41,6 @@ class OpenMeteoClient(private val openMeteoProperties: OpenMeteoProperties, webC
         .build()
         .createClient()
 
-    @RegisterReflectionForBinding(classes = [OpenMeteoForecastResponse::class])
     fun getForecast(latitude: Float, longitude: Float): Mono<OpenMeteoForecastResponse> =
         openMeteoHttpClient.getForecast(latitude, longitude, openMeteoProperties.hourlyParams.joinToString(","))
 

@@ -1,6 +1,5 @@
 package tech.aaregall.lab.functions.question.service.openai
 
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -15,7 +14,6 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory
 import org.springframework.web.service.invoker.createClient
 import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
-import java.lang.IllegalStateException
 import java.time.Duration
 import java.util.function.Predicate.not
 
@@ -46,7 +44,6 @@ class OpenAiClient(private val openAiClientProeprties: OpenAiProperties, webClie
         .build()
         .createClient()
 
-    @RegisterReflectionForBinding(classes = [OpenAiChatCompletionRequest::class, OpenAiChatCompletionResponse::class])
     fun chatCompletion(messages: List<String>): Mono<OpenAiChatCompletionResponse> =
         openAiHttpClient.chatCompletion(OpenAiChatCompletionRequest(openAiClientProeprties.model, messages.map { OpenAiMessage("user", it) }))
 

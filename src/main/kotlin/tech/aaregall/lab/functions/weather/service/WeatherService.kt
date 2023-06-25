@@ -1,8 +1,7 @@
 package tech.aaregall.lab.functions.weather.service
 
-import org.springframework.messaging.Message
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 import tech.aaregall.lab.functions.weather.domain.Forecast
 import tech.aaregall.lab.functions.weather.domain.GeoLocation
 import tech.aaregall.lab.functions.weather.domain.HourlyForecast
@@ -12,10 +11,9 @@ import tech.aaregall.lab.functions.weather.service.openmeteo.OpenMeteoForecastRe
 @Service
 class WeatherService(val openMeteoClient: OpenMeteoClient) {
 
-    fun getForecast(message: Message<GeoLocation>): Mono<Forecast> {
-        return openMeteoClient.getForecast(message.payload.latitude, message.payload.longitude)
-            .map(responseToForecast())
-    }
+    fun getForecast(geoLocations: Flux<GeoLocation>): Flux<Forecast> =
+        geoLocations.map { openMeteoClient.getForecast(it.latitude, it.longitude) }
+            .flatMap { it.map(responseToForecast()) }
 
     private fun responseToForecast(): (OpenMeteoForecastResponse) -> (Forecast) = {
         Forecast(GeoLocation(it.latitude, it.longitude),

@@ -2,8 +2,7 @@ package tech.aaregall.lab.functions.question
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.messaging.Message
-import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 import tech.aaregall.lab.functions.question.domain.Answer
 import tech.aaregall.lab.functions.question.domain.Question
 import tech.aaregall.lab.functions.question.service.QuestionService
@@ -12,6 +11,6 @@ import tech.aaregall.lab.functions.question.service.QuestionService
 class QuestionFunctions {
 
     @Bean
-    fun question(questionService: QuestionService): (Message<Question>) -> Mono<Answer> = questionService::answerQuestion
+    fun question(questionService: QuestionService): (Flux<Question>) -> Flux<Answer> = questionService::answerQuestion
 
 }

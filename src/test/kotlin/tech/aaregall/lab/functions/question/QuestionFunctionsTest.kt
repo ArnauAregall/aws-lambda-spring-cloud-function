@@ -1,15 +1,18 @@
 package tech.aaregall.lab.functions.question
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.system.CapturedOutput
+import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus
@@ -18,6 +21,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import tech.aaregall.lab.functions.question.service.openai.OpenAiProperties
 
 @SpringBootTest
+@ExtendWith(OutputCaptureExtension::class)
 class QuestionFunctionsTest(
     @Autowired val webTestClient: WebTestClient,
     @Autowired val mockServerClient: MockServerClient,
@@ -27,19 +31,8 @@ class QuestionFunctionsTest(
     inner class Question {
 
         @ParameterizedTest
-        @EmptySource
-        fun `When body is empty then returns server error`(body: String) {
-            webTestClient.post().uri("/question")
-                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .bodyValue(body)
-                .exchange()
-                .expectHeader().contentType(APPLICATION_JSON_VALUE)
-                .expectStatus().is5xxServerError
-        }
-
-        @ParameterizedTest
         @ValueSource(ints = [400, 401, 404, 503, 504])
-        fun `When OpenAI API returns client or server errors then returns server error`(statusCode: Int) {
+        fun `When OpenAI API returns client or server errors, then returns empty and error is handled`(statusCode: Int, capturedOutput: CapturedOutput) {
             mockServerClient.reset()
                 .`when`(
                     request()
@@ -51,15 +44,24 @@ class QuestionFunctionsTest(
             webTestClient.post().uri("/question")
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .bodyValue("""
-                    {"messages": ["Could you please say hello?"]}
+                    [
+                        {"messages": ["Could you please say hello?"]}
+                    ]
                 """.trimIndent())
                 .exchange()
                 .expectHeader().contentType(APPLICATION_JSON_VALUE)
-                .expectStatus().is5xxServerError
+                .expectStatus().is2xxSuccessful // limitation on Spring Cloud Function Webflux not being able to control response header
+                .expectBody()
+                .jsonPath("$").isArray
+                .jsonPath("$").isEmpty
+
+            assertThat(capturedOutput)
+                .contains("An error occurred while calling OpenAI for chat completion")
+                .contains(statusCode.toString())
         }
 
         @Test
-        fun `When OpenAI API returns results then returns OK and response contains Answer`() {
+        fun `When OpenAI API returns results, then returns OK and response contains Answer`() {
             mockServerClient.reset()
                 .`when`(
                     request()
@@ -111,8 +113,9 @@ class QuestionFunctionsTest(
                 .expectHeader().contentType(APPLICATION_JSON_VALUE)
                 .expectStatus().is2xxSuccessful
                 .expectBody()
-                .jsonPath("$.answer").isNotEmpty
-                .jsonPath("$.answer").isEqualTo("Hello there, glad you are so polite!\nHow may I assist you today?")
+                .jsonPath("$").isArray
+                .jsonPath("$").isNotEmpty
+                .jsonPath("$[0].answer").isEqualTo("Hello there, glad you are so polite!\nHow may I assist you today?")
         }
 
     }

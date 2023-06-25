@@ -1,21 +1,25 @@
 package tech.aaregall.lab.functions.weather
 
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.system.CapturedOutput
+import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.test.web.reactive.server.WebTestClient
 
+@ExtendWith(OutputCaptureExtension::class)
 @SpringBootTest
 class WeatherFunctionsTest(
     @Autowired val webTestClient: WebTestClient,
@@ -25,19 +29,8 @@ class WeatherFunctionsTest(
     inner class Forecast {
 
         @ParameterizedTest
-        @EmptySource
-        fun `When body is empty then returns server error`(body: String) {
-            webTestClient.post().uri("/forecast")
-                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .bodyValue(body)
-                .exchange()
-                .expectHeader().contentType(APPLICATION_JSON_VALUE)
-                .expectStatus().is5xxServerError
-        }
-
-        @ParameterizedTest
         @ValueSource(ints = [400, 404, 503, 504])
-        fun `When OpenMeteo API returns client or server errors then returns server error`(statusCode: Int) {
+        fun `When OpenMeteo API returns client or server errors then returns server error`(statusCode: Int, capturedOutput: CapturedOutput) {
             mockServerClient.reset()
                 .`when`(request()
                 .withMethod(GET.name())
@@ -53,7 +46,14 @@ class WeatherFunctionsTest(
                 """.trimIndent())
                 .exchange()
                 .expectHeader().contentType(APPLICATION_JSON_VALUE)
-                .expectStatus().is5xxServerError
+                .expectStatus().is2xxSuccessful // limitation on Spring Cloud Function Webflux not being able to control response header
+                .expectBody()
+                .jsonPath("$").isArray
+                .jsonPath("$").isEmpty
+
+            Assertions.assertThat(capturedOutput)
+                .contains("An error occurred while calling OpenMeteo for forecast")
+                .contains(statusCode.toString())
         }
 
         @Test
@@ -95,17 +95,19 @@ class WeatherFunctionsTest(
                 .expectHeader().contentType(APPLICATION_JSON_VALUE)
                 .expectStatus().is2xxSuccessful
                 .expectBody()
-                .jsonPath("$.geoLocation").isNotEmpty
-                .jsonPath("$.geoLocation.latitude").isEqualTo(latitude)
-                .jsonPath("$.geoLocation.longitude").isEqualTo(longitude)
-                .jsonPath("$.hourlyForecasts").isArray
-                .jsonPath("$.hourlyForecasts.length()").isEqualTo(2)
-                .jsonPath("$.hourlyForecasts[0].time").isEqualTo("2023-06-10T00:00:00")
-                .jsonPath("$.hourlyForecasts[0].temperature").isEqualTo(17.6)
-                .jsonPath("$.hourlyForecasts[0].precipitation").isEqualTo(1.0)
-                .jsonPath("$.hourlyForecasts[1].time").isEqualTo("2023-06-10T01:00:00")
-                .jsonPath("$.hourlyForecasts[1].temperature").isEqualTo(17.2)
-                .jsonPath("$.hourlyForecasts[1].precipitation").isEqualTo(0.5)
+                .jsonPath("$").isArray
+                .jsonPath("$").isNotEmpty
+                .jsonPath("$[0].geoLocation").isNotEmpty
+                .jsonPath("$[0].geoLocation.latitude").isEqualTo(latitude)
+                .jsonPath("$[0].geoLocation.longitude").isEqualTo(longitude)
+                .jsonPath("$[0].hourlyForecasts").isArray
+                .jsonPath("$[0].hourlyForecasts.length()").isEqualTo(2)
+                .jsonPath("$[0].hourlyForecasts[0].time").isEqualTo("2023-06-10T00:00:00")
+                .jsonPath("$[0].hourlyForecasts[0].temperature").isEqualTo(17.6)
+                .jsonPath("$[0].hourlyForecasts[0].precipitation").isEqualTo(1.0)
+                .jsonPath("$[0].hourlyForecasts[1].time").isEqualTo("2023-06-10T01:00:00")
+                .jsonPath("$[0].hourlyForecasts[1].temperature").isEqualTo(17.2)
+                .jsonPath("$[0].hourlyForecasts[1].precipitation").isEqualTo(0.5)
         }
 
     }

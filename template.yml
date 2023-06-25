@@ -19,6 +19,7 @@ Globals:
     Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 
 Resources:
+  # Lambda Function
   SpringCloudFunctionLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -34,9 +35,15 @@ Resources:
           Properties:
             TimeoutInMillis: 20000
             PayloadFormatVersion: '1.0'
-
     Metadata:
       BuildMethod: makefile # Instruct SAM how to build application.
+
+  # Lambda LogGroup
+  SpringCloudFunctionLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ '/', [ '/aws/lambda', !Ref SpringCloudFunctionLambda ] ]
+      RetentionInDays: 30
 
 Outputs:
   SpringCloudFunctionLambda:

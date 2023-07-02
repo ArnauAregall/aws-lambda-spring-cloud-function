@@ -1,5 +1,52 @@
 # aws-lambda-spring-cloud-function
 
+Demo project to showcase how to build an AWS Lambda using:
+
+- Kotlin
+- Gradle
+- GraalVM
+- Spring Boot 3
+- Spring Reactive Web (WebFlux, Netty framework)
+- Spring Cloud Function
+- OpenMeteo API
+- OpenAI API
+- Docker & Testcontainers
+
+Articles that were written based in this project:
+
+- [Exploring Spring Cloud Function, AI and AWS Lambda: building a native serverless application with Kotlin powered by OpenAI.](https://aregall.tech/aws-lambda-spring-cloud-function-kotlin-graalvm-native-openai)
+
+----
+
+## Requirements
+
+The application requires JDK 17 at least on a GraalVM distribution.
+
+````shell
+$ sdk install java 22.3.r17-grl
+$ sdk use java 22.3.r17-grl
+````
+----
+
+## Build and test
+
+````
+./gradlew build
+````
+----
+## Running the application
+
+### On a JDK
+
+````
+./gradlew bootRun
+````
+
+### Natively
+
+````
+./gradlew nativeRun
+````
 
 ## Building the native AWS Lambda artifact with SAM
 

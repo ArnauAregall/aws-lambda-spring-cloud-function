@@ -32,6 +32,7 @@ dependencies {
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.testcontainers:mockserver:${property("testcontainersVersion")}")
 	testImplementation("org.mock-server:mockserver-client-java:${property("mockServerVersion")}")
+	testImplementation("io.netty:netty-resolver-dns-native-macos:${property("nettyResolverDnsMacosVersion")}:osx-aarch_64")
 }
 
 dependencyManagement {
